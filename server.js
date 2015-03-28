@@ -21,6 +21,18 @@ var validate_item = function(req, res) {
   return true;
 };
 
+var get_data = function(req, cb)
+{
+  var data = '';
+  req.setEncoding('utf8');
+  req.on('data', function (chunk) {
+    data += chunk;
+  });
+  req.on('end', function () {
+    return cb(null, data);
+  });
+}
+
 var server = http.createServer(function (req, res) {
   switch (req.method) {
     case 'GET':
@@ -30,35 +42,25 @@ var server = http.createServer(function (req, res) {
       res.end();
       break;
     case 'POST':
-      var item = '';
-      req.setEncoding('utf8');
-      req.on('data', function (chunk) {
-        item += chunk;
-      });
-      req.on('end', function () {
+      get_data(req, function(err, item) {
         items.push(item);
         res.end('Item added\n');
       });
       break;
     case 'PUT':
-      var item = '';
       var item_id = item_id_from_url(req.url);
 
       if (!validate_item(req, res))
         return;
       else {
-        req.setEncoding('utf8');
-        req.on('data', function (chunk) {
-          item += chunk;
-        });
-        req.on('end', function () {
+        get_data(req, function(err, item) {
           items[item_id] = item;
           res.end('Item updated\n');
         });
       }
       break;
     case 'DELETE':
-      item_id = item_id_from_url(req.url);
+      var item_id = item_id_from_url(req.url);
 
       if (!validate_item(req, res))
         return;
