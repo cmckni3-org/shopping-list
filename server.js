@@ -21,6 +21,23 @@ var server = http.createServer(function (req, res) {
         res.end('Item added\n');
       });
       break;
+    case 'DELETE':
+      var pathname = url.parse(req.url).pathname;
+      var i = parseInt(pathname.slice(1), 10);
+
+      if (isNaN(i)) {
+          res.statusCode = 400;
+          res.end('Item id not valid');
+      }
+      else if (!items[i]) {
+          res.statusCode = 404;
+          res.end('Item not found');
+      }
+      else {
+          items.splice(i, 1);
+          res.end('Item deleted successfully');
+      }
+      break;
   }
 });
 
