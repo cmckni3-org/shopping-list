@@ -1,6 +1,25 @@
 var http  = require('http');
-var url   = require('url');
 var items = [];
+
+var item_id_from_url = function(url) {
+  var pathname = require('url').parse(url).pathname;
+  return parseInt(pathname.slice(1), 10);
+};
+
+var validate_item = function(req, res) {
+  item_id = item_id_from_url(req.url);
+  if (isNaN(item_id)) {
+    res.statusCode = 400;
+    res.end('Item id not valid');
+    return false;
+  }
+  else if (!items[item_id]) {
+    res.statusCode = 404;
+    res.end('Item not found');
+    return false;
+  }
+  return true;
+};
 
 var server = http.createServer(function (req, res) {
   switch (req.method) {
@@ -21,21 +40,31 @@ var server = http.createServer(function (req, res) {
         res.end('Item added\n');
       });
       break;
-    case 'DELETE':
-      var pathname = url.parse(req.url).pathname;
-      var i = parseInt(pathname.slice(1), 10);
+    case 'PUT':
+      var item = '';
+      var item_id = item_id_from_url(req.url);
 
-      if (isNaN(i)) {
-          res.statusCode = 400;
-          res.end('Item id not valid');
-      }
-      else if (!items[i]) {
-          res.statusCode = 404;
-          res.end('Item not found');
-      }
+      if (!validate_item(req, res))
+        return;
       else {
-          items.splice(i, 1);
-          res.end('Item deleted successfully');
+        req.setEncoding('utf8');
+        req.on('data', function (chunk) {
+          item += chunk;
+        });
+        req.on('end', function () {
+          items[item_id] = item;
+          res.end('Item updated\n');
+        });
+      }
+      break;
+    case 'DELETE':
+      item_id = item_id_from_url(req.url);
+
+      if (!validate_item(req, res))
+        return;
+      else {
+        items.splice(item_id, 1);
+        res.end('Item deleted successfully');
       }
       break;
   }
