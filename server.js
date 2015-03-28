@@ -1,4 +1,9 @@
 var http  = require('http');
+var parse = require('url').parse;
+var join  = require('path').join;
+var fs    = require('fs');
+var root  = __dirname;
+var qs    = require('querystring');
 var items = [];
 
 var item_id_from_url = function(url) {
@@ -8,7 +13,7 @@ var item_id_from_url = function(url) {
 
 var validate_item = function(req, res) {
   item_id = item_id_from_url(req.url);
-  if (isNaN(item_id)) {
+  if (typeof(item_id) === 'undefined' || item_id === null || isNaN(item_id)) {
     res.statusCode = 400;
     res.end('Item id not valid');
     return false;
@@ -28,6 +33,9 @@ var get_data = function(req, cb)
   req.on('data', function (chunk) {
     data += chunk;
   });
+  req.on('error', function(err) {
+    cb(err, null);
+  });
   req.on('end', function () {
     return cb(null, data);
   });
@@ -36,15 +44,46 @@ var get_data = function(req, cb)
 var server = http.createServer(function (req, res) {
   switch (req.method) {
     case 'GET':
-      items.forEach(function (item, i) {
-        res.write(i + '. ' + item + '\n');
-      });
+      var header = '<!DOCTYPE html>' +
+      '<html lang="en">' +
+      '<head>' +
+      '<meta charset="UTF-8">' +
+         '<title>Shopping List</title>' +
+      '</head>' +
+      '<body>';
+      var list_html = '';
+      if (items.length > 0)
+      {
+        list_html += '<ul>';
+        list_html += items.reduce(function (html, item) {
+          return html += '<li>' + qs.parse(item).item + '</li>';
+        }, '');
+        list_html += '</ul>';
+      }
+      else
+      {
+        list_html += 'Shopping List is empty';
+      }
+      var form_html = '<form action="/" method="post">' +
+          '<input type="text" name="item" placeholder="Enter an item">' +
+          '<button>Add Item</button>' +
+       '</form>' +
+      '</body>' +
+      '</html>';
+      res.write(header + list_html + form_html);
       res.end();
       break;
     case 'POST':
       get_data(req, function(err, item) {
-        items.push(item);
-        res.end('Item added\n');
+        if (err)
+        {
+          res.end('Internal Server error');
+        }
+        else
+        {
+          items.push(item);
+          res.end('Item added\n');
+        }
       });
       break;
     case 'PUT':
@@ -54,8 +93,15 @@ var server = http.createServer(function (req, res) {
         return;
       else {
         get_data(req, function(err, item) {
-          items[item_id] = item;
-          res.end('Item updated\n');
+          if (err)
+          {
+            res.end('Internal Server error');
+          }
+          else
+          {
+            items[item_id] = 'item=' + item;
+            res.end('Item updated\n');
+          }
         });
       }
       break;
