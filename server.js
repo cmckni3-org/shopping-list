@@ -37,61 +37,19 @@ var get_data = function(req, cb)
     cb(err, null);
   });
   req.on('end', function () {
-    return cb(null, data);
+    cb(null, data);
   });
-}
+};
 
 var server = http.createServer(function (req, res) {
   switch (req.method) {
-    case 'GET':
-      var header = '<!DOCTYPE html>' +
-      '<html lang="en">' +
-      '<head>' +
-      '<meta charset="UTF-8">' +
-         '<title>Shopping List</title>' +
-      '</head>' +
-      '<body>';
-      var list_html = '';
-      if (items.length > 0)
-      {
-        list_html += '<ul>';
-        list_html += items.reduce(function (html, item) {
-          return html += '<li>' + qs.parse(item).item + '</li>';
-        }, '');
-        list_html += '</ul>';
-      }
-      else
-      {
-        list_html += 'Shopping List is empty';
-      }
-      var form_html = '<form action="/" method="post">' +
-          '<input type="text" name="item" placeholder="Enter an item">' +
-          '<button>Add Item</button>' +
-       '</form>' +
-      '</body>' +
-      '</html>';
-      res.write(header + list_html + form_html);
-      res.end();
-      break;
-    case 'POST':
-      get_data(req, function(err, item) {
-        if (err)
-        {
-          res.end('Internal Server error');
-        }
-        else
-        {
-          items.push(item);
-          res.end('Item added\n');
-        }
-      });
-      break;
     case 'PUT':
       var item_id = item_id_from_url(req.url);
 
       if (!validate_item(req, res))
         return;
       else {
+        res.setHeader('Content-Type', 'text/plain');
         get_data(req, function(err, item) {
           if (err)
           {
@@ -111,10 +69,95 @@ var server = http.createServer(function (req, res) {
       if (!validate_item(req, res))
         return;
       else {
+        res.setHeader('Content-Type', 'text/plain');
         items.splice(item_id, 1);
         res.end('Item deleted successfully');
       }
       break;
+  }
+  if (req.url == '/')
+  {
+    switch (req.method) {
+      case 'GET':
+        var header = '<!DOCTYPE html>' +
+        '<html lang="en">' +
+        '<head>' +
+        '<meta charset="UTF-8">' +
+           '<title>Shopping List</title>' +
+           '<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/0.5.0/sweet-alert.css" />' +
+           '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>' +
+           '<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/0.5.0/sweet-alert.min.js"></script>' +
+        '</head>' +
+        '<body>';
+        var list_html = '';
+        if (items.length > 0)
+        {
+          list_html += '<ul>';
+          list_html += items.reduce(function (html, item, index) {
+            item_html = '<li>' +
+            '<span>' + qs.parse(item).item + '</span>' +
+            '<button data-edit data-id="' + index + '">Update</button>' +
+            '<button data-delete data-id="' + index + '">Delete</button></li>';
+            return html += item_html;
+          }, '');
+          list_html += '</ul>';
+        }
+        else
+        {
+          list_html += 'Shopping List is empty';
+        }
+        var form_html = '<form action="/" method="post">' +
+            '<input type="text" name="item" placeholder="Enter an item">' +
+            '<button>Add Item</button>' +
+         '</form>' +
+         '<script type="text/javascript" src="/shopping-list.js"></script>'
+        '</body>' +
+        '</html>';
+        res.setHeader('Content-Type', 'text/html');
+        res.write(header + list_html + form_html);
+        res.end();
+        break;
+      case 'POST':
+        res.setHeader('Content-Type', 'text/plain');
+        get_data(req, function(err, item) {
+          if (err)
+          {
+            res.end('Internal Server error');
+          }
+          else
+          {
+            items.push(item);
+            res.end('Item added\n');
+          }
+        });
+        break;
+    }
+  }
+  else if (req.method == 'GET')
+  {
+    var url = parse(req.url);
+    var path = join(root, url.pathname);
+    fs.stat(path, function (err, stat) {
+      if (err) {
+        if (err.code == 'ENOENT') {
+          res.statusCode = 404;
+          res.end('File Not Found');
+        }
+        else {
+          res.statusCode = 500;
+          res.end('Internal Server Error');
+        }
+      }
+      else {
+        var stream = fs.createReadStream(path);
+        res.setHeader('Content-Length', stat.size);
+        stream.pipe(res);
+        stream.on('error', function (err) {
+          res.statusCode = 500;
+          res.end('Internal Server Error');
+        });
+      }
+    });
   }
 });
 
