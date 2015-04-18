@@ -4,4 +4,4 @@ var itemSchema = mongoose.Schema({
     name: String
 });
 
-var Item = mongoose.model('Item', itemSchema);
+module.exports = mongoose.model('Item', itemSchema);

@@ -8,7 +8,7 @@ var qs    = require('querystring');
 // Environment configuration
 require('dotenv').load();
 
-var items = require('./items');
+var Item = require('./item');
 
 var mongoose = require('mongoose');
 
