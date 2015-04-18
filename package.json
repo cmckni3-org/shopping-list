@@ -5,5 +5,9 @@
   "scripts": {
     "start": "node server.js"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^1.1.0",
+    "mongoose": "^4.0.1"
+  }
 }

@@ -4,7 +4,13 @@ var join  = require('path').join;
 var fs    = require('fs');
 var root  = __dirname;
 var qs    = require('querystring');
-var items = [];
+
+// Environment configuration
+require('dotenv').load();
+
+var items = require('./items');
+
+var mongoose = require('mongoose');
 
 var item_id_from_url = function(url) {
   var pathname = require('url').parse(url).pathname;
@@ -159,6 +165,16 @@ var server = http.createServer(function (req, res) {
       }
     });
   }
+});
+
+mongoose.connect(process.env.SHOPPING_LIST_MONGO_URI);
+
+var db = mongoose.connection;
+db.on('error', function callback () {
+  console.error('connection error');
+});
+db.once('open', function callback () {
+  console.error('connection success');
 });
 
 server.listen(9000, function(){
