@@ -5,9 +5,17 @@
   "scripts": {
     "start": "node server.js"
   },
+  "repository" :
+  {
+    "type" : "git",
+    "url" : "https://github.com:cmckni3/shopping-list.git"
+  },
   "license": "MIT",
   "dependencies": {
     "dotenv": "^1.1.0",
     "mongoose": "^4.0.1"
+  },
+  "engine": {
+    "node": ">= 0.10"
   }
 }
