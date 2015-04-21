@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -16,12 +17,14 @@
     "debug": "~2.1.1",
     "express": "~4.12.2",
     "express-handlebars": "2.x",
-    "morgan": "~1.5.1",
-    "serve-favicon": "~2.2.0",
-    "mongoose": "4.0.x"
+    "mongoose": "4.0.x",
+    "morgan": "~1.5.1"
   },
   "devDependencies": {
+    "chai": "2.x",
+    "chai-http": "1.x",
     "dotenv": "1.x",
+    "mocha": "2.x",
     "node-dev": "2.x"
   },
   "engines": {
