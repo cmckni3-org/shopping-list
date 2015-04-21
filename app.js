@@ -7,7 +7,9 @@ var expressHbs   = require('express-handlebars');
 
 // Environment configuration
 if (process.env.NODE_ENV === 'development')
+{
   require('dotenv').load();
+}
 
 var mongoose = require('mongoose');
 
