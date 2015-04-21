@@ -1,3 +1,13 @@
+function deleteItem(id) {
+    $.ajax('/' + id, {
+        type: 'DELETE'
+    }).fail(function (err) {
+        swal(err);
+    }).done(function () {
+        location.reload();
+    });
+}
+
 $(function () {
     $('.items').on('click', '.delete', function (evt) {
         swal({
@@ -18,12 +28,3 @@ $(function () {
     });
 });
 
-function deleteItem(id) {
-    $.ajax('/' + id, {
-        type: 'DELETE'
-    }).fail(function (err) {
-        swal(err);
-    }).done(function () {
-        location.reload();
-    });
-}
