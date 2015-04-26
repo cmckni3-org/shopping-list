@@ -21,7 +21,7 @@
 
 * Start the server
   ```bash
-  npm start
+  NODE_ENV=development npm start
   ```
 
 ## Developing the application
@@ -33,5 +33,5 @@
 
 * Run the application
   ```bash
-  node-dev bin/www
+  NODE_ENV=development node-dev bin/www
   ```
