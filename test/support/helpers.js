@@ -4,3 +4,4 @@ var chai = require('chai'),
 var should = chai.should();
 chai.use(chai_http);
 
+require('dotenv').config({ path: '.env.test' });

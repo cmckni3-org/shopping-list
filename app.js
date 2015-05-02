@@ -21,7 +21,7 @@ db.on('error', function callback () {
   console.error('connection error');
 });
 db.once('open', function callback () {
-  console.error('connection success');
+  console.log('connection success');
 });
 
 var app = express();
