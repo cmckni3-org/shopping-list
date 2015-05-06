@@ -1,11 +1,11 @@
-var chai = require('chai'),
+var chai      = require('chai'),
     chai_http = require('chai-http');
 
 var expect = chai.expect;
 
-var app = require('../app');
+var app    = require('../app');
 
-var Item = require('../app/shopping-list/item.js');
+var Item   = require('../app/shopping-list/item.js');
 
 chai.use(chai_http);
 
