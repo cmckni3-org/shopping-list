@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* node.js >= 0.10
+* node.js >= 4.x
 * MongoDB
 
 ## Run the application
