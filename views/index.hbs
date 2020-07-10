@@ -1,19 +1,22 @@
-<h1>My Shopping List <a class="add contain" href="/item/new">+</a></h1>
+<h1>My Shopping List <a class="add contain"
+     href="/item/new">+</a></h1>
 
 <div class="content">
   <ul class="items">
     {{#each items}}
-    <li>
-      <div class="actions">
-        <a href="/{{_id}}/edit" class="edit button">Edit</a>
-        <span class="delete" data-id="{{_id}}">&times;</span>
-      </div>
-      <a href="/{{_id}}">
-        <div class="info">
-          <header class="name">{{name}}</header>
+      <li>
+        <div class="actions">
+          <a href="/{{_id}}/edit"
+             class="edit button">Edit</a>
+          <span class="delete"
+                data-id="{{_id}}">&times;</span>
         </div>
-      </a>
-    </li>
+        <a href="/{{_id}}">
+          <div class="info">
+            <header class="name">{{name}}</header>
+          </div>
+        </a>
+      </li>
     {{/each}}
   </ul>
 </div>
